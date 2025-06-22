@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Sky Runner Shrek</title>
+  <link rel="icon" type="image/png" href="sherek.png" />
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: url('sherek2.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background 0.5s ease;
+      height: 100%;
+    }
+
+    #score {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 0 8px #000000;
+      user-select: none;
+      z-index: 5;
+    }
+
+    #startScreen {
+      min-width: 260px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ffffff;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 0 0 12px #000000;
+      cursor: pointer;
+      user-select: none;
+      z-index: 5;
+    }
+
+    #victoryScreen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('vitoria.jpg') no-repeat center center;
+      background-size: cover;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .game-button {
+      padding: 14px 28px;
+      font-size: 20px;
+      font-family: 'Georgia', serif;
+      background: #8b5e3c;
+      color: #fff8dc;
+      border: 4px solid #5c3b1e;
+      border-radius: 12px;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px #000;
+      box-shadow: 0 4px #5c3b1e;
+      transition: all 0.2s ease-in-out;
+      margin: 10px;
+      user-select: none;
+    }
+
+    .game-button:hover {
+      background-color: #a9714b;
+      box-shadow: 0 6px #3e2714;
+      transform: scale(1.05);
+    }
+
+    /* Estilo para o placar, parecido com botão, mas desabilitado */
+    #score {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      user-select: none;
+      z-index: 5;
+
+      /* aparência de botão */
+      padding: 14px 28px;
+      font-size: 20px;
+      font-family: 'Georgia', serif;
+      background: #8b5e3c;
+      color: #fff8dc;
+      border: 4px solid #5c3b1e;
+      border-radius: 12px;
+      text-shadow: 1px 1px 2px #000;
+      box-shadow: inset 0 2px 4px #b4a06b;
+      cursor: default;
+    }
+
+    /* Estilo para startScreen, que será um botão */
+    #startScreen {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      user-select: none;
+      z-index: 5;
+
+      /* aparência de botão */
+      padding: 14px 28px;
+      font-size: 24px;
+      font-family: 'Georgia', serif;
+      background: #8b5e3c;
+      color: #fff8dc;
+      border: 4px solid #5c3b1e;
+      border-radius: 12px;
+      text-shadow: 1px 1px 2px #000;
+      box-shadow: 0 4px #5c3b1e;
+      transition: all 0.2s ease-in-out;
+      text-align: center;
+      min-width: 220px;
+    }
+    #startScreen:hover {
+      background-color: #a9714b;
+      box-shadow: 0 6px #3e2714;
+      transform: scale(1.05);
+    }
+
+    #gameOverScreen {
+      display: none;
+      position: fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background: rgba(0,0,0,0.75);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff8dc;
+      font-family: 'Georgia', serif;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div id="score">Pontos: 0</div>
+<div id="startScreen">
+  <div>Toque para começar</div>
+  <div style="font-size: 16px; margin-top: 10px; font-weight: normal;">
+    Chegue a 10 pontos para vencer!
+  </div>
+</div>
+
+
+  <div id="victoryScreen">
+    <h1 style="color: #fff8dc; font-size: 40px; text-shadow: 2px 2px 6px #000;">Você venceu!</h1>
+    <button class="game-button" id="restartBtn">Reiniciar</button>
+    <button class="game-button" id="backButton">Voltar ao menu inicial</button>
+  </div>
+  <div id="gameOverScreen">
+    <h1 style="font-size: 40px; text-shadow: 2px 2px 6px #000;">Game Over!</h1>
+    <button class="game-button" id="restartGameOverBtn">Reiniciar</button>
+    <button class="game-button" id="backGameOverBtn">Voltar ao menu inicial</button>
+  </div>
+
+  <audio id="bgMusic" src="musica1.mp3" loop autoplay></audio>
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const scoreDisplay = document.getElementById('score');
+      const startScreen = document.getElementById('startScreen');
+      const victoryScreen = document.getElementById('victoryScreen');
+      const backButton = document.getElementById('backButton');
+      const restartBtn = document.getElementById('restartBtn');
+      const gameOverScreen = document.getElementById('gameOverScreen');
+      const restartGameOverBtn = document.getElementById('restartGameOverBtn');
+      const backGameOverBtn = document.getElementById('backGameOverBtn');
+      const bgMusic = document.getElementById('bgMusic');
+      const body = document.body;
+
+      victoryScreen.style.display = 'none';
+      startScreen.style.display = 'block';
+      gameOverScreen.style.display = 'none';
+      scoreDisplay.textContent = "Pontos: 0";
+
+      const WIDTH = canvas.width;
+      const HEIGHT = canvas.height;
+
+      const GRAVITY = 1.3;
+      const JUMP_POWER = 33;
+      const PLAYER_WIDTH = 130;
+      const PLAYER_HEIGHT = 180;
+      const OBSTACLE_WIDTH = 30;
+      const OBSTACLE_HEIGHT = 50;
+      const OBSTACLE_GAP = 350;
+      const OBSTACLE_SPEED = 6;
+      const OBSTACLE_MIN_DISTANCE = 350; // distância mínima entre obstáculos
+      const OBSTACLE_MAX_DISTANCE = 500; // limite superior para evitar espaçamento exagerado 
+
+      let gameRunning = false;
+      let score = 0;
+
+      const player = {
+        x: WIDTH / 4,
+        y: HEIGHT - PLAYER_HEIGHT - 10,
+        vy: 0,
+        onGround: true,
+        width: PLAYER_WIDTH,
+        height: PLAYER_HEIGHT,
+        color: '#00ffe3',
+      };
+
+      let obstacles = [];
+
+function createObstacle(x) {
+  const isPrince = Math.random() < 0.5;
+  const randomGapOffset = Math.random() * 100; // Varia entre 0 e 100
+  return {
+    x: x + randomGapOffset,
+    y: HEIGHT - (isPrince ? 100 : 70) - 10,
+    width: 50,
+    height: isPrince ? 100 : 70,
+    type: isPrince ? 'prince' : 'lorde',
+    color: '#ff0044'
+  };
+}
+
+
+
+function resetGame() {
+  score = 0;
+  player.y = HEIGHT - PLAYER_HEIGHT - 10;
+  player.vy = 0;
+  player.onGround = true;
+  obstacles = [];
+  for (let i = 0; i < 3; i++) {
+    obstacles.push(createObstacle(WIDTH + 600 + i * OBSTACLE_GAP));
+  }
+  scoreDisplay.textContent = "Pontos: 0";
+  startScreen.style.display = 'none';
+  victoryScreen.style.display = 'none';
+  gameOverScreen.style.display = 'none';
+  gameRunning = true;
+
+  // Alterar fundo para fundo.jpg quando o jogo começar
+  body.style.background = "url('fundo.jpg') no-repeat center center fixed";
+  body.style.backgroundSize = "cover";
+
+  loop();
+}
+
+    const princeImg = new Image();
+princeImg.src = 'prince.webp';
+
+const lordeImg = new Image();
+lordeImg.src = 'lorde.webp';
+
+      const playerImg = new Image();
+      playerImg.src = 'sherek.png';
+
+      function drawPlayer() {
+        if (playerImg.complete && playerImg.naturalWidth !== 0) {
+          ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.fillStyle = player.color;
+          ctx.fillRect(player.x, player.y, player.width, player.height);
+          ctx.shadowBlur = 0;
+        }
+      }
+
+function drawObstacle(ob) {
+  const img = ob.type === 'prince' ? princeImg : lordeImg;
+
+  if (img.complete && img.naturalWidth !== 0) {
+    ctx.drawImage(img, ob.x, ob.y, ob.width, ob.height);
+  } else {
+    ctx.fillStyle = ob.color;
+    ctx.fillRect(ob.x, ob.y, ob.width, ob.height);
+    ctx.strokeStyle = '#ff6699';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(ob.x, ob.y, ob.width, ob.height);
+  }
+}
+
+
+      function updatePlayer() {
+        player.vy += GRAVITY;
+        player.y += player.vy;
+        if (player.y + player.height >= HEIGHT - 10) {
+          player.y = HEIGHT - player.height - 10;
+          player.vy = 0;
+          player.onGround = true;
+        }
+      }
+
+let lastObstacleX = WIDTH + OBSTACLE_GAP * (obstacles.length - 1); // inicialização inicial, fora da função
+
+function updateObstacles() {
+  for (let i = 0; i < obstacles.length; i++) {
+    obstacles[i].x -= OBSTACLE_SPEED;
+
+    if (obstacles[i].x + obstacles[i].width < 0) {
+      // Define intervalo mínimo e máximo entre obstáculos
+      const randomGap = OBSTACLE_MIN_DISTANCE + Math.random() * (OBSTACLE_MAX_DISTANCE - OBSTACLE_MIN_DISTANCE);
+
+      // Garante que o novo obstáculo fique depois do último
+      const newX = Math.max(lastObstacleX + OBSTACLE_MIN_DISTANCE, WIDTH + randomGap);
+
+      obstacles[i] = createObstacle(newX);
+      lastObstacleX = obstacles[i].x;
+
+      score++;
+      scoreDisplay.textContent = `Pontos: ${score}`;
+    }
+  }
+}
+
+      function checkCollision() {
+        for (let ob of obstacles) {
+          if (
+            player.x < ob.x + ob.width &&
+            player.x + player.width > ob.x &&
+            player.y < ob.y + ob.height &&
+            player.y + player.height > ob.y
+          ) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function clear() {
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+      }
+
+      function loop() {
+        if (!gameRunning) return;
+        clear();
+        updatePlayer();
+        updateObstacles();
+        drawPlayer();
+        obstacles.forEach(drawObstacle);
+
+        if (checkCollision()) {
+          gameOver();
+          return;
+        }
+
+        if (score >= 10) {
+          showVictory();
+          return;
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      function gameOver() {
+        gameRunning = false;
+        startScreen.style.display = 'none';
+        victoryScreen.style.display = 'none';
+        gameOverScreen.style.display = 'flex';
+
+        // Voltar o fundo para o inicial quando acabar o jogo
+        body.style.background = "url('sherek2.jpg') no-repeat center center fixed";
+body.style.backgroundSize = "cover";
+      }
+
+      function showVictory() {
+        gameRunning = false;
+        victoryScreen.style.display = 'flex';
+
+        // Voltar o fundo para o inicial na vitória também
+        body.style.background = "url('sherek2.jpg') no-repeat center center fixed";
+body.style.backgroundSize = "cover";
+      }
+
+      function jump() {
+        if (player.onGround) {
+          player.vy = -JUMP_POWER;
+          player.onGround = false;
+        }
+      }
+
+      startScreen.addEventListener('click', () => {
+        if (!gameRunning) {
+          resetGame();
+        }
+      });
+
+      canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (!gameRunning) resetGame();
+        else jump();
+      }, { passive: false });
+
+      canvas.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (!gameRunning) resetGame();
+        else jump();
+      });
+
+      backButton.addEventListener('click', () => {
+        victoryScreen.style.display = 'none';
+        startScreen.style.display = 'block';
+        startScreen.textContent = 'Toque para começar';
+
+        // Voltar o fundo para o inicial ao voltar ao menu
+        body.style.background = "url('sherek2.jpg') no-repeat center center fixed";
+body.style.backgroundSize = "cover";
+      });
+
+      restartBtn.addEventListener('click', () => {
+        resetGame();
+      });
+
+      restartGameOverBtn.addEventListener('click', () => {
+        resetGame();
+        gameOverScreen.style.display = 'none';
+      });
+
+      backGameOverBtn.addEventListener('click', () => {
+        gameOverScreen.style.display = 'none';
+        startScreen.style.display = 'block';
+        startScreen.textContent = 'Toque para começar';
+
+        // Voltar o fundo para o inicial ao voltar ao menu
+        body.style.background = "url('sherek2.jpg') no-repeat center center fixed";
+body.style.backgroundSize = "cover";
+      });
+
+function iniciarMusica() {
+  if (bgMusic.paused) {
+    bgMusic.volume = 0.6; // ajuste de volume
+    bgMusic.loop = true;
+    bgMusic.play().catch(() => {
+      console.warn("Navegador bloqueou autoplay. Tocará após interação.");
+    });
+  }
+}
+
+// Tentar tocar imediatamente (caso o navegador permita)
+iniciarMusica();
+
+// Tocar após o primeiro clique ou toque, se necessário
+document.addEventListener('click', iniciarMusica, { once: true });
+document.addEventListener('touchstart', iniciarMusica, { once: true });
+
+
+    })();
+  </script>
+</body>
+</html>
