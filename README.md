@@ -28,7 +28,7 @@ Um jogo de corrida infinita com o icônico Shrek! Pule os obstáculos, alcance 1
    - `musica1.mp3`
 3. Abra o `index.html` no navegador (preferencialmente no Chrome ou Firefox)
 
-> ✅ Totalmente jogável em dispositivos **mobile** e **desktop**.
+> ✅ Totalmente jogável em dispositivos **mobile**.
 
 ---
 
