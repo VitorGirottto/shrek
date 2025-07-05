@@ -84,7 +84,6 @@
       transform: scale(1.05);
     }
 
-    /* Estilo para o placar, parecido com botão, mas desabilitado */
     #score {
       position: fixed;
       top: 15px;
@@ -92,7 +91,6 @@
       user-select: none;
       z-index: 5;
 
-      /* aparência de botão */
       padding: 14px 28px;
       font-size: 20px;
       font-family: 'Georgia', serif;
@@ -105,7 +103,6 @@
       cursor: default;
     }
 
-    /* Estilo para startScreen, que será um botão */
     #startScreen {
       position: fixed;
       top: 50%;
@@ -115,7 +112,6 @@
       user-select: none;
       z-index: 5;
 
-      /* aparência de botão */
       padding: 14px 28px;
       font-size: 24px;
       font-family: 'Georgia', serif;
@@ -210,8 +206,8 @@
       const OBSTACLE_HEIGHT = 50;
       const OBSTACLE_GAP = 350;
       const OBSTACLE_SPEED = 4;
-      const OBSTACLE_MIN_DISTANCE = 350; // distância mínima entre obstáculos
-      const OBSTACLE_MAX_DISTANCE = 500; // limite superior para evitar espaçamento exagerado 
+      const OBSTACLE_MIN_DISTANCE = 350;
+      const OBSTACLE_MAX_DISTANCE = 500; 
 
       let gameRunning = false;
       let score = 0;
@@ -230,7 +226,7 @@
 
 function createObstacle(x) {
   const isPrince = Math.random() < 0.5;
-  const randomGapOffset = Math.random() * 100; // Varia entre 0 e 100
+  const randomGapOffset = Math.random() * 100;
   return {
     x: x + randomGapOffset,
     y: HEIGHT - (isPrince ? 100 : 70) - 10,
@@ -310,17 +306,15 @@ function drawObstacle(ob) {
         }
       }
 
-let lastObstacleX = WIDTH + OBSTACLE_GAP * (obstacles.length - 1); // inicialização inicial, fora da função
+let lastObstacleX = WIDTH + OBSTACLE_GAP * (obstacles.length - 1);
 
 function updateObstacles() {
   for (let i = 0; i < obstacles.length; i++) {
     obstacles[i].x -= OBSTACLE_SPEED;
 
     if (obstacles[i].x + obstacles[i].width < 0) {
-      // Define intervalo mínimo e máximo entre obstáculos
       const randomGap = OBSTACLE_MIN_DISTANCE + Math.random() * (OBSTACLE_MAX_DISTANCE - OBSTACLE_MIN_DISTANCE);
 
-      // Garante que o novo obstáculo fique depois do último
       const newX = Math.max(lastObstacleX + OBSTACLE_MIN_DISTANCE, WIDTH + randomGap);
 
       obstacles[i] = createObstacle(newX);
@@ -377,7 +371,6 @@ function updateObstacles() {
         victoryScreen.style.display = 'none';
         gameOverScreen.style.display = 'flex';
 
-        // Voltar o fundo para o inicial quando acabar o jogo
         body.style.background = "url('sherek2.jpg') no-repeat center center fixed";
 body.style.backgroundSize = "cover";
       }
@@ -386,7 +379,6 @@ body.style.backgroundSize = "cover";
         gameRunning = false;
         victoryScreen.style.display = 'flex';
 
-        // Voltar o fundo para o inicial na vitória também
         body.style.background = "url('sherek2.jpg') no-repeat center center fixed";
 body.style.backgroundSize = "cover";
       }
@@ -421,7 +413,6 @@ body.style.backgroundSize = "cover";
         startScreen.style.display = 'block';
         startScreen.textContent = 'Toque para começar';
 
-        // Voltar o fundo para o inicial ao voltar ao menu
         body.style.background = "url('sherek2.jpg') no-repeat center center fixed";
 body.style.backgroundSize = "cover";
       });
@@ -440,14 +431,13 @@ body.style.backgroundSize = "cover";
         startScreen.style.display = 'block';
         startScreen.textContent = 'Toque para começar';
 
-        // Voltar o fundo para o inicial ao voltar ao menu
         body.style.background = "url('sherek2.jpg') no-repeat center center fixed";
 body.style.backgroundSize = "cover";
       });
 
 function iniciarMusica() {
   if (bgMusic.paused) {
-    bgMusic.volume = 0.6; // ajuste de volume
+    bgMusic.volume = 0.6;
     bgMusic.loop = true;
     bgMusic.play().catch(() => {
       console.warn("Navegador bloqueou autoplay. Tocará após interação.");
@@ -455,10 +445,8 @@ function iniciarMusica() {
   }
 }
 
-// Tentar tocar imediatamente (caso o navegador permita)
 iniciarMusica();
 
-// Tocar após o primeiro clique ou toque, se necessário
 document.addEventListener('click', iniciarMusica, { once: true });
 document.addEventListener('touchstart', iniciarMusica, { once: true });
 
